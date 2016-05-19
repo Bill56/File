@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -18,6 +19,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bill.file.adapter.FileAdapter;
@@ -34,6 +36,8 @@ public class MainActivity extends BaseActivity {
 
     // 承载主活动的根布局对象
     CoordinatorLayout layout;
+    // 显示当前路径的Text
+    private TextView textFilePath;
     // 视图
     private ListView listView;
     // 数据
@@ -53,6 +57,8 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         // 初始化视图
         initView();
+        // 初始化Action，让其显示返回键
+        initActionBar();
     }
 
     /**
@@ -61,6 +67,7 @@ public class MainActivity extends BaseActivity {
     private void initView() {
         layout = (CoordinatorLayout) findViewById(R.id.rl_layout);
         listView = (ListView) findViewById(R.id.listView);
+        textFilePath = (TextView) findViewById(R.id.text_file_path);
         // TODO 加载SD卡中的文件
         // 外部存储中的文件,即获取sd卡路径
         File sdPath = Environment.getExternalStorageDirectory();
@@ -71,6 +78,14 @@ public class MainActivity extends BaseActivity {
         // 设置文件列表为空时候的显示视图
         listView.setEmptyView(findViewById(R.id.ll_file_list_empt));
         listView.setOnItemClickListener(new OnFileItemClickListener());
+    }
+
+    /**
+     * 初始化ActionBar
+     */
+    private void initActionBar() {
+        ActionBar bar = getSupportActionBar();
+        bar.setDisplayHomeAsUpEnabled(true);
     }
 
     /**
@@ -128,6 +143,10 @@ public class MainActivity extends BaseActivity {
 
         // TODO 考虑多选的处理
         switch (item.getItemId()) {
+            case android.R.id.home:
+                // 调用返回方法
+                onBackPressed();
+                break;
             case R.id.action_new:
                 doNew();
                 break;
@@ -237,6 +256,8 @@ public class MainActivity extends BaseActivity {
             filesData = new ArrayList<>();
         // 更新将当前文件目录的引用
         currentDir = parentDir;
+        // 更新Text显示的路径
+        textFilePath.setText(getString(R.string.activity_main_file_path) + currentDir.getAbsolutePath());
         // 获得目录中的所有文件
         File[] files = parentDir.listFiles();
         // Log.d("MainActivity",String.valueOf(files.length));
