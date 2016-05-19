@@ -11,18 +11,22 @@ import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bill.file.adapter.FileAdapter;
 import com.bill.file.R;
+import com.bill.file.util.DeviceUtil;
 import com.bill.file.util.FileUtil;
 import com.bill.file.util.LogUtil;
 import com.bill.file.util.ToastUtil;
@@ -36,6 +40,8 @@ public class MainActivity extends BaseActivity {
 
     // 承载主活动的根布局对象
     CoordinatorLayout layout;
+    // 承载底部容量大小的布局
+    private LinearLayout llShowROMSize;
     // 显示当前路径的Text
     private TextView textFilePath;
     // 视图
@@ -44,6 +50,12 @@ public class MainActivity extends BaseActivity {
     private List<File> filesData;
     // 适配器
     private FileAdapter fileAdapter;
+    // ROM总容量
+    private TextView textROMTotalSize;
+    // ROM可用容量
+    private TextView textROMValibleSize;
+    // 可用容量比
+    private ProgressBar progressROMPercent;
     // 保存当前文件列表所在目录的变量
     private File currentDir;
     // 该活动弹出对话框时所共用的dialog对象
@@ -61,6 +73,8 @@ public class MainActivity extends BaseActivity {
         initView();
         // 初始化Action，让其显示返回键
         initActionBar();
+        // 初始化设备存储信息
+        initROMData();
     }
 
     /**
@@ -68,8 +82,12 @@ public class MainActivity extends BaseActivity {
      */
     private void initView() {
         layout = (CoordinatorLayout) findViewById(R.id.rl_layout);
+        llShowROMSize = (LinearLayout) findViewById(R.id.ll_show_romsize);
         listView = (ListView) findViewById(R.id.listView);
         textFilePath = (TextView) findViewById(R.id.text_file_path);
+        textROMTotalSize = (TextView) findViewById(R.id.text_show_total);
+        textROMValibleSize = (TextView) findViewById(R.id.text_show_valible);
+        progressROMPercent = (ProgressBar) findViewById(R.id.progress_rom_percent);
         // TODO 加载SD卡中的文件
         // 外部存储中的文件,即获取sd卡路径
         File sdPath = Environment.getExternalStorageDirectory();
@@ -88,6 +106,24 @@ public class MainActivity extends BaseActivity {
     private void initActionBar() {
         ActionBar bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    /**
+     * 初始化获得ROM容量
+     */
+    private void initROMData() {
+        // 获取大小
+        long totalSize = DeviceUtil.getRomTotalSize();
+        long valibleSize = DeviceUtil.getRomAvailableSize();
+        // 将获取到的大小赋值给TextView
+        textROMTotalSize.append(Formatter.formatFileSize(this, totalSize));
+        textROMValibleSize.append(Formatter.formatFileSize(this, valibleSize));
+        // 计算百分比
+        float romPercentF = (float)valibleSize/totalSize;
+        // 将百分比换成整数
+        int romPercent = (int)(romPercentF * 100);
+        progressROMPercent.setMax(100);
+        progressROMPercent.setProgress(100-romPercent);
     }
 
     /**
@@ -301,6 +337,8 @@ public class MainActivity extends BaseActivity {
                 if (fileType != null) {
                     intent.setDataAndType(data, fileType);
                     startActivity(intent);
+                } else {
+                    ToastUtil.show(MainActivity.this,R.string.file_open_error);
                 }
             } else {
                 // 清除列表数据
@@ -309,6 +347,11 @@ public class MainActivity extends BaseActivity {
                 loadFilesData(file);
                 // 通知文件适配器
                 fileAdapter.notifyDataSetChanged();
+                // 判断当前是否为根目录
+                if (!currentDir.getAbsolutePath().equals(Environment.getExternalStorageDirectory().getAbsolutePath())) {
+                    // 隐藏机身存储布局视图
+                    llShowROMSize.setVisibility(View.GONE);
+                }
             }
         }
     }
@@ -327,6 +370,13 @@ public class MainActivity extends BaseActivity {
             filesData.clear();
             loadFilesData(currentDir.getParentFile());
             fileAdapter.notifyDataSetChanged();
+            // 判断更新后的当前目录是否为根目录
+            if (currentDir.getAbsolutePath().equals(sdPath.getAbsolutePath())) {
+                // 设置机身存储显示布局的显示
+                llShowROMSize.setVisibility(View.VISIBLE);
+                // 重新计算存储量
+                initROMData();
+            }
         } else {
             // 获取当前时间
             long currentTime = System.currentTimeMillis();

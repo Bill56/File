@@ -17,4 +17,5 @@
     <string name="activity_main_list_empty_hint">快去创建一个文件吧</string>
     <string name="activity_main_file_path">当前路径:</string>
     <string name="dialog_new_undo">撤销</string>
+    <string name="file_open_error">没有可以打开该文件的程序</string>
 </resources>
