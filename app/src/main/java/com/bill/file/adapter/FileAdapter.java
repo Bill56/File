@@ -1,4 +1,4 @@
-package com.bill.file;
+package com.bill.file.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +12,9 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.bill.file.R;
+import com.bill.file.util.ToastUtil;
 
 import java.io.File;
 import java.util.List;
@@ -199,26 +202,23 @@ public class FileAdapter extends BaseAdapter {
          * 执行文件的重命名操作
          */
         private void doRename() {
-            showToast("重命名：" + file.getName());
+            ToastUtil.show(mContext,"重命名：" + file.getName());
         }
 
         /**
          * 执行文件的删除操作
          */
         private void doRemove() {
-            showToast("删除：" + file.getName());
+            ToastUtil.show(mContext, "删除：" + file.getName());
         }
 
         /**
          * 执行文件的复制操作
          */
         private void doCopy() {
-            showToast("复制：" + file.getName());
+            ToastUtil.show(mContext,"复制：" + file.getName());
         }
 
-        private void showToast(String msg) {
-            Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
-        }
 
     }
 

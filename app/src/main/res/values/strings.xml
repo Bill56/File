@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">File</string>
+    <string name="activity_main_option_search_file">搜索文件</string>
+    <string name="activity_main_option_create_file">新建文件夹</string>
+    <string name="activity_main_option_sort_file">排序</string>
+    <string name="activity_main_option_sort_size">文件大小</string>
+    <string name="activity_main_option_sort_update">修改时间</string>
+    <string name="activity_main_option_sort_type">文件类型</string>
+    <string name="dialog_edit_new_file_hint">文件夹名称</string>
+    <string name="dialog_title_new_file">创建文件夹</string>
+    <string name="dialog_ok">确认</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="dialog_new_file_empty_toast">文件夹名称不能为空</string>
+    <string name="dialog_new_file_fail_toast">创建失败：存在同名文件夹</string>
+    <string name="dialog_new_file_success_toast">文件夹创建成功</string>
+    <string name="activity_main_list_empty">文件夹空空如也</string>
+    <string name="activity_main_list_empty_hint">快去创建一个文件吧</string>
+    <string name="activity_main_file_path">当前路径:</string>
 </resources>
