@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +23,7 @@ import android.widget.Toast;
 
 import com.bill.file.adapter.FileAdapter;
 import com.bill.file.R;
+import com.bill.file.util.FileUtil;
 import com.bill.file.util.LogUtil;
 import com.bill.file.util.ToastUtil;
 
@@ -293,10 +293,8 @@ public class MainActivity extends BaseActivity {
                 intent.setAction(Intent.ACTION_VIEW);
                 Uri data = Uri.fromFile(file);
                 // 获得文件后缀名
-                // 获得最后一个.的索引
-                int index = file.getName().lastIndexOf(".");
-                String suffix = file.getName().substring(index + 1);
-                Log.d("MainActivity", suffix);
+                String suffix = FileUtil.getFileExtension(file);
+                LogUtil.d(LogUtil.TAG, suffix);
                 String fileType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(suffix);
                 if (fileType != null) {
                     intent.setDataAndType(data, fileType);
