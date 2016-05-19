@@ -16,4 +16,5 @@
     <string name="activity_main_list_empty">文件夹空空如也</string>
     <string name="activity_main_list_empty_hint">快去创建一个文件吧</string>
     <string name="activity_main_file_path">当前路径:</string>
+    <string name="dialog_new_undo">撤销</string>
 </resources>

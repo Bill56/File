@@ -48,6 +48,8 @@ public class MainActivity extends BaseActivity {
     private File currentDir;
     // 该活动弹出对话框时所共用的dialog对象
     private AlertDialog dialog;
+    // 记录按下back键后的毫秒数
+    private long lastBackPressed;
 
 
     @Override
@@ -175,16 +177,7 @@ public class MainActivity extends BaseActivity {
     private void doNew() {
         // 执行操作
         showDialogWhenDoNew();
-        // 给用户可以交互的提示
-        Snackbar.make(layout, "已添加", Snackbar.LENGTH_INDEFINITE).
-                setAction("撤销",
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                // TODO
 
-                            }
-                        }).show();
     }
 
     /**
@@ -223,7 +216,16 @@ public class MainActivity extends BaseActivity {
                         filesData.add(createDir);
                         // 通知文件适配器列表发生改变
                         fileAdapter.notifyDataSetChanged();
-                        ToastUtil.show(MainActivity.this, newFileName + getString(R.string.dialog_new_file_success_toast));
+                        // 给用户可以交互的提示
+                        Snackbar.make(layout, newFileName + getString(R.string.dialog_new_file_success_toast), Snackbar.LENGTH_INDEFINITE).
+                                setAction(R.string.dialog_new_undo,
+                                        new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                // 点击撤销后执行的操作
+
+                                            }
+                                        }).show();
                     } else {
                         ToastUtil.show(MainActivity.this, R.string.dialog_new_file_fail_toast);
                     }
@@ -319,14 +321,21 @@ public class MainActivity extends BaseActivity {
         // 如果当前目录为sd卡根目录，则不返回上一级，否则返回上一即目录
         // 外部存储中的文件,即获取sd卡路径
         File sdPath = Environment.getExternalStorageDirectory();
-        LogUtil.d(LogUtil.TAG,sdPath.getAbsolutePath().toString());
-        LogUtil.d(LogUtil.TAG,currentDir.getAbsolutePath().toString());
+        LogUtil.d(LogUtil.TAG, sdPath.getAbsolutePath().toString());
+        LogUtil.d(LogUtil.TAG, currentDir.getAbsolutePath().toString());
         if (!currentDir.getAbsolutePath().equals(sdPath.getAbsolutePath())) {
             filesData.clear();
             loadFilesData(currentDir.getParentFile());
             fileAdapter.notifyDataSetChanged();
         } else {
-            finish();
+            // 获取当前时间
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastBackPressed < 2000) {
+                super.onBackPressed();
+            } else {
+                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            }
+            lastBackPressed = currentTime;
         }
     }
 
